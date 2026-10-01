@@ -11,13 +11,23 @@ It extends X-JEPA (Choudhury et al., WACV 2026) by introducing latent subspace d
 
 2. **Subspace-Selective Invariance**:
    Invariance is applied only to the shared common features ($c_{\text{sar}}, c_{\text{opt}}$). Unique features ($u_{\text{sar}}, u_{\text{opt}}$) remain unconstrained by cross-modal alignment:
-   $$\mathcal{L}_{\text{inv}} = \frac{1}{B} \sum_{i=1}^B \| c_{\text{sar}}^{(i)} - c_{\text{opt}}^{(i)} \|_2^2$$
+
+   $$
+   \mathcal{L}_{\text{inv}} = \frac{1}{B} \sum_{i=1}^B \| c_{\text{sar}}^{(i)} - c_{\text{opt}}^{(i)} \|_2^2
+   $$
 
 3. **Cross-Subspace Mutual Exclusion Penalty ($\mathcal{L}_{\text{excl}}$)**:
    Prevents shared and unique subspaces from collapsing or leaking information into each other:
-   $$\mathcal{L}_{\text{excl}} = \frac{1}{3} \left[ \mathcal{C}(c_{\text{sar}}, u_{\text{sar}}) + \mathcal{C}(c_{\text{opt}}, u_{\text{opt}}) + \mathcal{C}(u_{\text{sar}}, u_{\text{opt}}) \right]$$
+
+   $$
+   \mathcal{L}_{\text{excl}} = \frac{1}{3} \left[ \mathcal{C}(c_{\text{sar}}, u_{\text{sar}}) + \mathcal{C}(c_{\text{opt}}, u_{\text{opt}}) + \mathcal{C}(u_{\text{sar}}, u_{\text{opt}}) \right]
+   $$
+
    where:
-   $$\mathcal{C}(A, B) = \frac{1}{\dim(A) \cdot \dim(B)} \left\| \frac{(A - \bar{A})^\top (B - \bar{B})}{N - 1} \right\|_F^2$$
+
+   $$
+   \mathcal{C}(A, B) = \frac{1}{\dim(A) \cdot \dim(B)} \left\| \frac{(A - \bar{A})^\top (B - \bar{B})}{N - 1} \right\|_F^2
+   $$
 
 4. **Dynamic Cosine Regularization Scheduling**:
    X-JEPA uses static VICReg weights throughout training. DX-JEPA anneals variance, covariance, and exclusion weights via cosine decay to promote manifold expansion early and fine-grained alignment late:
@@ -51,24 +61,41 @@ DX-JEPA improves cross-modal retrieval by +5.88% on S1 -> S2 and +4.35% on S2 ->
 
 ## Loss Formulation
 
-$$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{pred}} + \mathcal{L}_{\text{d-VICReg}}$$
+$$
+\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{pred}} + \mathcal{L}_{\text{d-VICReg}}
+$$
 
 ### Prediction Loss
 
-$$\mathcal{L}_{\text{pred}} = \mathcal{L}_{L_2} + \lambda_{\text{PSA}} \mathcal{L}_{\text{PSA}}$$
+$$
+\mathcal{L}_{\text{pred}} = \mathcal{L}_{L_2} + \lambda_{\text{PSA}} \mathcal{L}_{\text{PSA}}
+$$
 
 - $\mathcal{L}_{L_2}$: Symmetric MSE loss between predicted and target patch representations.
 - $\mathcal{L}_{\text{PSA}}$: Prediction Space Alignment loss using a learned metric weight matrix $M \in \mathbb{R}^{D \times D}$ initialized to $0.1 \cdot I$:
-  $$\text{PSA}(\hat{Y}, Y) = \mathbb{E} \left[ \sqrt{ \| (\hat{Y} - Y) M \|_2^2 + \epsilon \| \hat{Y} - Y \|_2^2 + 10^{-6}} \right]$$
+
+  $$
+  \text{PSA}(\hat{Y}, Y) = \mathbb{E} \left[ \sqrt{ \| (\hat{Y} - Y) M \|_2^2 + \epsilon \| \hat{Y} - Y \|_2^2 + 10^{-6}} \right]
+  $$
 
 ### Decoupled VICReg Loss
 
-$$\mathcal{L}_{\text{d-VICReg}} = \lambda_{\text{inv}} \mathcal{L}_{\text{inv}}(c_a, c_b) + \lambda_{\text{var}}(t) \mathcal{L}_{\text{var}} + \lambda_{\text{cov}}(t) \mathcal{L}_{\text{cov}} + \lambda_{\text{excl}}(t) \mathcal{L}_{\text{excl}}$$
+$$
+\mathcal{L}_{\text{d-VICReg}} = \lambda_{\text{inv}} \mathcal{L}_{\text{inv}}(c_a, c_b) + \lambda_{\text{var}}(t) \mathcal{L}_{\text{var}} + \lambda_{\text{cov}}(t) \mathcal{L}_{\text{cov}} + \lambda_{\text{excl}}(t) \mathcal{L}_{\text{excl}}
+$$
 
 - Variance loss: computed across all four subspaces ($c_a, c_b, u_a, u_b$):
-  $$v(Z) = \frac{1}{D} \sum_{j=1}^D \max(0, 1 - \sqrt{\text{Var}(Z_j) + \epsilon})$$
+
+  $$
+  v(Z) = \frac{1}{D} \sum_{j=1}^D \max(0, 1 - \sqrt{\text{Var}(Z_j) + \epsilon})
+  $$
+
 - Covariance loss: penalizes off-diagonal covariance across all four subspaces:
-  $$c(Z) = \frac{1}{D^2} \sum_{i \neq j} [\text{Cov}(Z)]_{ij}^2$$
+
+  $$
+  c(Z) = \frac{1}{D^2} \sum_{i \neq j} [\text{Cov}(Z)]_{ij}^2
+  $$
+
 - Exclusion loss: cross-covariance penalty between $(c_a, u_a)$, $(c_b, u_b)$, and $(u_a, u_b)$.
 
 ## Repository Structure
