@@ -1,4 +1,4 @@
-"""Decoupled X-JEPA (dxjepa) - Stage 3: Modular Architecture & Loss Engine."""
+"""Decoupled X-JEPA (dxjepa) - Stage 4: Data Engineering & Evaluation Engine."""
 
 from dxjepa.models.xjepa import XJEPA
 from dxjepa.models.stem import PatchEmbedding, ModalityStem
@@ -18,6 +18,10 @@ from dxjepa.losses.vicreg import (
     cross_covariance_penalty,
 )
 from dxjepa.losses.criterion import compute_loss, l2_prediction_loss
+from dxjepa.data.dataset import BigEarthNetDataset
+from dxjepa.data.masking import generate_disjoint_masks, split_visible_masked
+from dxjepa.data.builder import build_dataframe, build_dataloaders, SyntheticBigEarthNetDataset
+from dxjepa.evaluation.retrieval import evaluate_retrieval_f1, compute_cross_retrieval_matrix
 
 __all__ = [
     "XJEPA",
@@ -38,4 +42,12 @@ __all__ = [
     "cross_covariance_penalty",
     "compute_loss",
     "l2_prediction_loss",
+    "BigEarthNetDataset",
+    "generate_disjoint_masks",
+    "split_visible_masked",
+    "build_dataframe",
+    "build_dataloaders",
+    "SyntheticBigEarthNetDataset",
+    "evaluate_retrieval_f1",
+    "compute_cross_retrieval_matrix",
 ]

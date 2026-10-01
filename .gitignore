@@ -9,7 +9,7 @@ __pycache__/
 checkpoints/
 
 # Datasets and caches
-data/
+/data/
 BEN_14k/
 *.parquet
 *.tif
