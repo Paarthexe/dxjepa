@@ -1,0 +1,61 @@
+{
+  "data": {
+    "data_root": "/kaggle/input/datasets/narendraaironi/bigearthnet-14k/BEN_14k",
+    "metadata_filename": "metadata.parquet",
+    "s1_dirname": "BigEarthNet-S1",
+    "s2_dirname": "BigEarthNet-S2",
+    "image_size": 224,
+    "patch_size": 16,
+    "sar_channels": 2,
+    "optical_channels": 10,
+    "batch_size": 256,
+    "num_workers": 4,
+    "pin_memory": true,
+    "drop_last": true,
+    "persistent_workers": true
+  },
+  "mask": {
+    "context_mask_ratio": 0.5,
+    "target_mask_ratio": 0.5
+  },
+  "model": {
+    "embed_dim": 768,
+    "depth": 12,
+    "num_heads": 12,
+    "predictor_embed_dim": 384,
+    "predictor_depth": 12,
+    "predictor_heads": 12,
+    "num_shared_queries": 16,
+    "d_common": 512,
+    "sar_channels": 2,
+    "optical_channels": 10,
+    "patch_size": 16,
+    "image_size": 224
+  },
+  "loss": {
+    "lambda_psa": 0.1,
+    "lambda_inv": 1.0,
+    "lambda_var": 25.0,
+    "lambda_cov": 25.0,
+    "lambda_excl": 5.0,
+    "lambda_var_min": 5.0,
+    "lambda_cov_min": 2.0,
+    "lambda_excl_min": 1.0,
+    "eps_psa": 0.0001
+  },
+  "training": {
+    "epochs": 200,
+    "lr": 0.0003,
+    "weight_decay": 0.04,
+    "warmup_epochs": 15,
+    "grad_clip": 1.0,
+    "seed": 67,
+    "use_amp": true,
+    "eval_freq": 10,
+    "checkpoint_freq": 50,
+    "checkpoint_dir": "checkpoints",
+    "output_model_path": "dxjepa_model.pth",
+    "device": null,
+    "synthetic_data": false
+  }
+}

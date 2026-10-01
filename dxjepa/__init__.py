@@ -1,4 +1,4 @@
-"""Decoupled X-JEPA (dxjepa) - Stage 4: Data Engineering & Evaluation Engine."""
+"""Decoupled X-JEPA (dxjepa) - Multimodal Remote Sensing Foundation Model."""
 
 from dxjepa.models.xjepa import XJEPA
 from dxjepa.models.stem import PatchEmbedding, ModalityStem
@@ -20,8 +20,25 @@ from dxjepa.losses.vicreg import (
 from dxjepa.losses.criterion import compute_loss, l2_prediction_loss
 from dxjepa.data.dataset import BigEarthNetDataset
 from dxjepa.data.masking import generate_disjoint_masks, split_visible_masked
-from dxjepa.data.builder import build_dataframe, build_dataloaders, SyntheticBigEarthNetDataset
-from dxjepa.evaluation.retrieval import evaluate_retrieval_f1, compute_cross_retrieval_matrix
+from dxjepa.data.builder import (
+    build_dataframe,
+    build_dataloaders,
+    SyntheticBigEarthNetDataset,
+)
+from dxjepa.evaluation.retrieval import (
+    evaluate_retrieval_f1,
+    compute_cross_retrieval_matrix,
+)
+from dxjepa.configs.config import (
+    DataConfig,
+    MaskConfig,
+    ModelConfig,
+    LossConfig,
+    TrainingConfig,
+    ExperimentConfig,
+)
+from dxjepa.utils.seed import set_seed
+from dxjepa.utils.ema import update_target_model
 
 __all__ = [
     "XJEPA",
@@ -50,4 +67,12 @@ __all__ = [
     "SyntheticBigEarthNetDataset",
     "evaluate_retrieval_f1",
     "compute_cross_retrieval_matrix",
+    "DataConfig",
+    "MaskConfig",
+    "ModelConfig",
+    "LossConfig",
+    "TrainingConfig",
+    "ExperimentConfig",
+    "set_seed",
+    "update_target_model",
 ]
