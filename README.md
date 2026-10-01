@@ -75,33 +75,97 @@ $$\mathcal{L}_{\text{d-VICReg}} = \lambda_{\text{inv}} \mathcal{L}_{\text{inv}}(
 
 ```text
 .
-├── dxjepa.ipynb                # Complete end-to-end training and evaluation notebook
+├── config.json                 # Centralized configuration (data paths, model, training)
+├── dxjepa/                     # Core library package
+│   ├── configs/                # Configuration dataclasses and JSON loaders
+│   ├── data/                   # Dataset loader, dataframe builder, disjoint masking
+│   ├── evaluation/             # Cross-modal retrieval F1@K metrics
+│   ├── losses/                 # PSA, Decoupled VICReg, composite loss
+│   ├── models/                 # Stems, shared ViT trunk, cross-modal predictor, XJEPA
+│   └── utils/                  # Seeding and EMA target model updates
+├── dxjepa.ipynb                # Self-contained alternative notebook
+├── evaluate.py                 # Standalone retrieval evaluation script
+├── pyproject.toml              # Build and package configuration
 ├── README.md                   # Project documentation
-├── Choudhury_X-JEPA_...pdf     # Baseline X-JEPA paper (WACV 2026)
-├── pyproject.toml              # Build configuration
-└── requirements.txt            # Python dependencies
+├── requirements.txt            # Python dependencies
+├── tests/                      # Unit test suite
+└── train.py                    # Pretraining script
 ```
 
-## Running the Notebook
+## Running Instructions
 
-1. Install requirements:
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 1. Installation
 
-2. Point `DATA_ROOT` in `dxjepa.ipynb` to your BigEarthNet-14K directory:
+```bash
+pip install -r requirements.txt
+```
+
+Or install as an editable package:
+```bash
+pip install -e .
+```
+
+### 2. Configuration (`config.json`)
+
+All paths, hyperparameters, and schedules are managed in `config.json`. Update `data_root` to point to your local BigEarthNet-14K installation:
+
+```json
+{
+  "data": {
+    "data_root": "/path/to/BEN_14k",
+    "batch_size": 256,
+    "num_workers": 4
+  },
+  "training": {
+    "epochs": 200,
+    "lr": 0.0003,
+    "output_model_path": "dxjepa_model.pth"
+  }
+}
+```
+
+### 3. Training via CLI
+
+Run training directly without CLI arguments:
+```bash
+python train.py
+```
+
+`train.py` reads `config.json` by default. To point to an alternate configuration file:
+```bash
+python train.py --config path/to/custom_config.json
+```
+
+### 4. Evaluation via CLI
+
+Evaluate a saved checkpoint on the retrieval benchmark:
+```bash
+python evaluate.py
+```
+
+To evaluate a specific checkpoint file:
+```bash
+python evaluate.py --checkpoint checkpoints/dxjepa_epoch_200.pth
+```
+
+### 5. Running Tests
+
+Execute the unit test suite:
+```bash
+pytest
+```
+
+### 6. Alternative: Interactive Notebook (`dxjepa.ipynb`)
+
+As an alternative to the modular CLI scripts, `dxjepa.ipynb` contains the complete end-to-end pipeline in a single self-contained Jupyter notebook suitable for interactive environments (Colab, Kaggle, local JupyterLab).
+
+To run the notebook:
+1. Open `dxjepa.ipynb`.
+2. Update the dataset directory paths in cell 9:
    ```python
    DATA_ROOT = Path('/path/to/BEN_14k')
    METADATA_PATH = DATA_ROOT / 'metadata.parquet'
    S1_ROOT = DATA_ROOT / 'BigEarthNet-S1'
    S2_ROOT = DATA_ROOT / 'BigEarthNet-S2'
    ```
-
-3. Training parameters used:
-   - Batch size: 256
-   - Image size: 224x224 (patch size 16x16, 196 patches)
-   - Encoder: 12-layer ViT, 768-dim, 12 heads
-   - Predictor: 12-layer Transformer, 384-dim, 12 heads
-   - Masking ratio: 50% context visible, 50% target masked (strictly disjoint)
-   - Epochs: 200 (15 linear warmup, 185 cosine decay)
-   - Optimizer: AdamW (lr: 3e-4, weight decay: 0.04)
+3. Execute cells sequentially.
